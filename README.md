@@ -1,4 +1,29 @@
 # Welcome to your Expo app 👋
+Habit tracker to get used to the process
+
+##Scope
+-add a daily habit to track
+-able to delete habit
+-able to track habit for a day
+-be able to view history of the habit
+=see the streak for that habit
+
+##Advance features
+-notifications
+-add habits to different categories
+-support different habit frequencies (daily, weekly, specific days)
+
+##tech stack
+-React Native
+-Expo 
+-TypeScript
+-Firebase
+
+
+
+
+
+
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
