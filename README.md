@@ -1,5 +1,5 @@
 # Welcome to your Expo app 👋
-Habit tracker to get used to the process
+Habit tracker to get used to the process of building mobile AND web apps
 
 ##Scope
 -add a daily habit to track
