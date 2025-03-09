@@ -37,6 +37,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ef84d91b-9e2d-4bbf-bbec-4b913a67f851"
+      }
+    },
+    "owner": "thegreatbey"
   }
 }

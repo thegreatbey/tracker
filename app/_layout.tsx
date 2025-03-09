@@ -7,12 +7,15 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { HabitTracker } from '../components/HabitTracker';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
+  useAppLifecycle();
+
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -31,14 +34,21 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
+      <Stack>
+        <Stack.Screen 
+          name="index" 
+          options={{ headerShown: false }} 
+        />
         <Stack.Screen 
           name="privacy-policy" 
           options={{ 
             headerShown: true,
             title: 'Privacy Policy',
-            presentation: 'modal'
+            presentation: 'modal',
+            headerStyle: {
+              backgroundColor: isDark ? '#1a1a1a' : '#fff',
+            },
+            headerTintColor: isDark ? '#fff' : '#000',
           }} 
         />
         <Stack.Screen 
@@ -46,7 +56,11 @@ export default function RootLayout() {
           options={{ 
             headerShown: true,
             title: 'Terms of Service',
-            presentation: 'modal'
+            presentation: 'modal',
+            headerStyle: {
+              backgroundColor: isDark ? '#1a1a1a' : '#fff',
+            },
+            headerTintColor: isDark ? '#fff' : '#000',
           }} 
         />
       </Stack>

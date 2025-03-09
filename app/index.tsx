@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-import { HabitTracker } from '@/components/HabitTracker';
+import { HabitTracker } from '../components/HabitTracker';
+import { GuestStorageTest } from '../components/GuestStorageTest';
 
 export default function Index() {
   // Following our Authentication State Focus:
@@ -9,6 +10,7 @@ export default function Index() {
   // 3. Proper visibility control
   return (
     <View style={{ flex: 1 }}>
+      <GuestStorageTest />
       <HabitTracker />
     </View>
   );

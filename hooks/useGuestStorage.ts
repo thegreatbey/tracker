@@ -10,21 +10,77 @@ interface Storage {
 
 // In web guest mode, we use sessionStorage to ensure data doesn't persist across sessions
 const webStorage: Storage = {
-  getItem: async (key: string) => window.sessionStorage.getItem(key),
-  setItem: async (key: string, value: string) => window.sessionStorage.setItem(key, value),
-  removeItem: async (key: string) => window.sessionStorage.removeItem(key),
-  clear: async () => window.sessionStorage.clear(),
+  getItem: async (key: string) => {
+    try {
+      return window.sessionStorage.getItem(key);
+    } catch (error) {
+      console.error('Failed to get item from sessionStorage:', error);
+      return null;
+    }
+  },
+  setItem: async (key: string, value: string) => {
+    try {
+      window.sessionStorage.setItem(key, value);
+    } catch (error) {
+      console.error('Failed to set item in sessionStorage:', error);
+      throw error;
+    }
+  },
+  removeItem: async (key: string) => {
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch (error) {
+      console.error('Failed to remove item from sessionStorage:', error);
+      throw error;
+    }
+  },
+  clear: async () => {
+    try {
+      window.sessionStorage.clear();
+    } catch (error) {
+      console.error('Failed to clear sessionStorage:', error);
+      throw error;
+    }
+  },
 };
 
 // In native, we use AsyncStorage but with a guest prefix
 const nativeStorage: Storage = {
-  getItem: (key: string) => AsyncStorage.getItem(`guest_${key}`),
-  setItem: (key: string, value: string) => AsyncStorage.setItem(`guest_${key}`, value),
-  removeItem: (key: string) => AsyncStorage.removeItem(`guest_${key}`),
+  getItem: async (key: string) => {
+    try {
+      return await AsyncStorage.getItem(`guest_${key}`);
+    } catch (error) {
+      console.error('Failed to get item from AsyncStorage:', error);
+      return null;
+    }
+  },
+  setItem: async (key: string, value: string) => {
+    try {
+      await AsyncStorage.setItem(`guest_${key}`, value);
+    } catch (error) {
+      console.error('Failed to set item in AsyncStorage:', error);
+      throw error;
+    }
+  },
+  removeItem: async (key: string) => {
+    try {
+      await AsyncStorage.removeItem(`guest_${key}`);
+    } catch (error) {
+      console.error('Failed to remove item from AsyncStorage:', error);
+      throw error;
+    }
+  },
   clear: async () => {
-    const keys = await AsyncStorage.getAllKeys();
-    const guestKeys = keys.filter(key => key.startsWith('guest_'));
-    await AsyncStorage.multiRemove(guestKeys);
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const guestKeys = keys.filter(key => key.startsWith('guest_'));
+      if (guestKeys.length > 0) {
+        await AsyncStorage.multiRemove(guestKeys);
+      }
+    } catch (error) {
+      console.error('Failed to clear guest keys from AsyncStorage:', error);
+      throw error;
+    }
   },
 };
 
