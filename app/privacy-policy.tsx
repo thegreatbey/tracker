@@ -1,46 +1,77 @@
 import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import { Stack } from 'expo-router';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function PrivacyPolicy() {
+  const router = useRouter();
+  const { colorScheme } = useColorScheme();
+  
+  const isDark = colorScheme === 'dark';
+  const backgroundColor = isDark ? '#1a1a1a' : '#fff';
+  const textColor = isDark ? '#fff' : '#000';
+  const borderColor = isDark ? '#333' : '#ddd';
+
   return (
-    <>
-      <Stack.Screen options={{ title: 'Privacy Policy' }} />
-      <ScrollView style={styles.container}>
-        <ThemedView style={styles.content}>
-          <ThemedText type="title">Privacy Policy</ThemedText>
-          <ThemedText style={styles.lastUpdated}>Last Updated: March 2024</ThemedText>
-          
-          <ThemedText type="subtitle">Information We Collect</ThemedText>
-          <ThemedText>
-            We collect information that you provide directly to us when using the Habit Tracker app,
-            including habit data and user preferences.
-          </ThemedText>
+    <View style={[styles.container, { backgroundColor }]}>
+      <View style={[styles.header, { borderBottomColor: borderColor }]}>
+        <TouchableOpacity 
+          onPress={() => router.back()} 
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color="#007AFF" />
+        </TouchableOpacity>
+        <Text style={[styles.title, { color: textColor }]}>Privacy Policy</Text>
+        <View style={styles.placeholder} />
+      </View>
 
-          <ThemedText type="subtitle">How We Use Your Information</ThemedText>
-          <ThemedText>
-            We use the information to provide and improve the Habit Tracker service, including:
-            {'\n'}- Storing and managing your habits
-            {'\n'}- Calculating streaks and progress
-            {'\n'}- Providing notifications (if enabled)
-          </ThemedText>
+      <ScrollView style={styles.content}>
+        <Text style={[styles.section, { color: textColor }]}>
+          Last Updated: {new Date().toLocaleDateString()}
+        </Text>
 
-          <ThemedText type="subtitle">Data Storage</ThemedText>
-          <ThemedText>
-            Your data is stored securely and is not shared with third parties. Guest mode data
-            is stored locally on your device and is cleared when you log out.
-          </ThemedText>
+        <Text style={[styles.section, { color: textColor }]}>
+          Welcome to the Habit Tracker App. This Privacy Policy explains how we collect, use, and protect your information.
+        </Text>
 
-          <ThemedText type="subtitle">Contact Us</ThemedText>
-          <ThemedText>
-            If you have any questions about this Privacy Policy, please contact us at:
-            support@habittracker.com
-          </ThemedText>
-        </ThemedView>
+        <Text style={[styles.heading, { color: textColor }]}>Information We Collect</Text>
+        <Text style={[styles.text, { color: textColor }]}>
+          • Usage Data: We collect information about how you use the app{'\n'}
+          • Settings Preferences: Your app settings and preferences{'\n'}
+          • Habit Data: Information about your habits and tracking
+        </Text>
+
+        <Text style={[styles.heading, { color: textColor }]}>How We Use Your Information</Text>
+        <Text style={[styles.text, { color: textColor }]}>
+          • To provide and maintain the app functionality{'\n'}
+          • To improve your user experience{'\n'}
+          • To send notifications you've requested
+        </Text>
+
+        <Text style={[styles.heading, { color: textColor }]}>Data Storage</Text>
+        <Text style={[styles.text, { color: textColor }]}>
+          • Guest Mode: Data is stored temporarily and cleared when you close the app{'\n'}
+          • Account Mode: Data is stored securely and synced across your devices
+        </Text>
+
+        <Text style={[styles.heading, { color: textColor }]}>Your Rights</Text>
+        <Text style={[styles.text, { color: textColor }]}>
+          You have the right to:{'\n'}
+          • Access your data{'\n'}
+          • Delete your data{'\n'}
+          • Opt-out of notifications{'\n'}
+          • Request data export
+        </Text>
+
+        <Text style={[styles.heading, { color: textColor }]}>Contact Us</Text>
+        <Text style={[styles.text, { color: textColor }]}>
+          If you have any questions about this Privacy Policy, please contact us at support@habittracker.com
+        </Text>
+
+        <View style={styles.bottomSpacing} />
       </ScrollView>
-    </>
+    </View>
   );
 }
 
@@ -48,12 +79,43 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  content: {
-    padding: 20,
-    gap: 16,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
   },
-  lastUpdated: {
-    color: '#666',
-    marginBottom: 20,
+  backButton: {
+    padding: 8,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  placeholder: {
+    width: 40,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  section: {
+    fontSize: 16,
+    marginBottom: 24,
+  },
+  heading: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 16,
+  },
+  bottomSpacing: {
+    height: 40,
   },
 }); 

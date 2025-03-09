@@ -13,33 +13,67 @@ export default function TermsOfService() {
           <ThemedText type="title">Terms of Service</ThemedText>
           <ThemedText style={styles.lastUpdated}>Last Updated: March 2024</ThemedText>
           
-          <ThemedText type="subtitle">1. Acceptance of Terms</ThemedText>
+          <ThemedText type="subtitle">1. Agreement to Terms</ThemedText>
           <ThemedText>
-            By accessing or using the Habit Tracker app, you agree to be bound by these Terms of Service.
+            By accessing or using the Habit Tracker app, you agree to be bound by these Terms of Service. 
+            If you disagree with any part of these terms, you may not access the service.
           </ThemedText>
 
-          <ThemedText type="subtitle">2. User Data</ThemedText>
+          <ThemedText type="subtitle">2. Description of Service</ThemedText>
           <ThemedText>
-            You retain all rights to your data. By using the app, you grant us the right to store and
-            process your data to provide the service.
+            Habit Tracker is a personal habit tracking application that allows users to:
+            {'\n'}- Create and track daily habits
+            {'\n'}- Monitor progress and streaks
+            {'\n'}- Set reminders
+            {'\n'}- View performance analytics
           </ThemedText>
 
-          <ThemedText type="subtitle">3. User Responsibilities</ThemedText>
+          <ThemedText type="subtitle">3. User Accounts</ThemedText>
           <ThemedText>
-            You are responsible for:
-            {'\n'}- Maintaining the confidentiality of your account
-            {'\n'}- All activities that occur under your account
-            {'\n'}- Ensuring your data is accurate
+            - You may use the app in guest mode or create an account
+            {'\n'}- You are responsible for maintaining account security
+            {'\n'}- You must provide accurate account information
+            {'\n'}- You may not share account credentials
           </ThemedText>
 
-          <ThemedText type="subtitle">4. Service Modifications</ThemedText>
+          <ThemedText type="subtitle">4. Acceptable Use</ThemedText>
           <ThemedText>
-            We reserve the right to modify or discontinue the service at any time, with or without notice.
+            You agree not to:
+            {'\n'}- Misuse the service
+            {'\n'}- Attempt to gain unauthorized access
+            {'\n'}- Use the service for illegal purposes
+            {'\n'}- Interfere with other users' experience
           </ThemedText>
 
-          <ThemedText type="subtitle">5. Contact</ThemedText>
+          <ThemedText type="subtitle">5. Data and Privacy</ThemedText>
           <ThemedText>
-            For questions about these Terms, please contact: legal@habittracker.com
+            - We collect and use data as described in our Privacy Policy
+            {'\n'}- You retain ownership of your data
+            {'\n'}- We may anonymize data for analytics
+            {'\n'}- You can request data deletion
+          </ThemedText>
+
+          <ThemedText type="subtitle">6. Modifications</ThemedText>
+          <ThemedText>
+            We reserve the right to:
+            {'\n'}- Modify or discontinue the service
+            {'\n'}- Update these terms
+            {'\n'}- Change pricing (with notice)
+          </ThemedText>
+
+          <ThemedText type="subtitle">7. Limitation of Liability</ThemedText>
+          <ThemedText>
+            We provide the service "as is" without warranties. We are not liable for:
+            {'\n'}- Data loss
+            {'\n'}- Service interruptions
+            {'\n'}- Indirect damages
+          </ThemedText>
+
+          <ThemedText type="subtitle">8. Contact</ThemedText>
+          <ThemedText>
+            For questions about these Terms:
+            {'\n'}Email: legal@habittracker.com
+            {'\n'}Address: 123 Legal Avenue, Terms City, 12345
           </ThemedText>
         </ThemedView>
       </ScrollView>

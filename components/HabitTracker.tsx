@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { collection, addDoc, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
-import { firestore } from '../config/firebase';
 import { NavigationBar } from './NavigationBar';
 import { AddHabitModal } from './AddHabitModal';
 import { Settings } from './Settings';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuthContext } from '@/providers/AuthProvider';
 
 const GUEST_HABITS_KEY = '@guest_habits';
 
@@ -26,28 +23,17 @@ export function HabitTracker() {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const { colorScheme } = useColorScheme();
-  const { user } = useAuthContext();
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    // Clear any stale data
-    AsyncStorage.clear();
     loadHabits();
-  }, [user]);
+  }, []);
 
   const loadHabits = async () => {
     try {
-      if (user) {
-        // Load from Firebase
-        const habitsCollection = collection(firestore, 'habits');
-        const snapshot = await getDocs(habitsCollection);
-        setHabits(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Habit)));
-      } else {
-        // Load from AsyncStorage for guest mode
-        const savedHabits = await AsyncStorage.getItem(GUEST_HABITS_KEY);
-        if (savedHabits) {
-          setHabits(JSON.parse(savedHabits));
-        }
+      const savedHabits = await AsyncStorage.getItem(GUEST_HABITS_KEY);
+      if (savedHabits) {
+        setHabits(JSON.parse(savedHabits));
       }
     } catch (error) {
       console.error('Error loading habits:', error);
@@ -65,18 +51,9 @@ export function HabitTracker() {
         longestStreak: 0
       };
 
-      // Always allow adding habits, whether in guest mode or authenticated
-      if (user) {
-        // Save to Firebase
-        const docRef = await addDoc(collection(firestore, 'habits'), newHabit);
-        newHabit.id = docRef.id;
-        setHabits(prev => [...prev, { ...newHabit, id: docRef.id }]);
-      } else {
-        // Save to AsyncStorage for guest mode
-        const updatedHabits = [...habits, newHabit];
-        await AsyncStorage.setItem(GUEST_HABITS_KEY, JSON.stringify(updatedHabits));
-        setHabits(updatedHabits);
-      }
+      const updatedHabits = [...habits, newHabit];
+      await AsyncStorage.setItem(GUEST_HABITS_KEY, JSON.stringify(updatedHabits));
+      setHabits(updatedHabits);
     } catch (error) {
       console.error('Error adding habit:', error);
     }
@@ -84,16 +61,9 @@ export function HabitTracker() {
 
   const deleteHabit = async (habitId: string) => {
     try {
-      if (user) {
-        // Delete from Firebase
-        const habitDoc = doc(firestore, 'habits', habitId);
-        await deleteDoc(habitDoc);
-      } else {
-        // Delete from AsyncStorage for guest mode
-        const updatedHabits = habits.filter(h => h.id !== habitId);
-        await AsyncStorage.setItem(GUEST_HABITS_KEY, JSON.stringify(updatedHabits));
-      }
-      setHabits(prevHabits => prevHabits.filter(habit => habit.id !== habitId));
+      const updatedHabits = habits.filter(h => h.id !== habitId);
+      await AsyncStorage.setItem(GUEST_HABITS_KEY, JSON.stringify(updatedHabits));
+      setHabits(updatedHabits);
     } catch (error) {
       console.error('Error deleting habit:', error);
     }
@@ -156,26 +126,13 @@ export function HabitTracker() {
         currentStreak: current,
         longestStreak: Math.max(longest, habit.longestStreak || 0)
       };
-
-      if (user) {
-        // Update in Firebase
-        const habitDoc = doc(firestore, 'habits', habit.id);
-        await updateDoc(habitDoc, {
-          completions: newCompletions,
-          currentStreak: current,
-          longestStreak: Math.max(longest, habit.longestStreak || 0)
-        });
-      } else {
-        // Update in AsyncStorage for guest mode
-        const updatedHabits = habits.map(h => 
-          h.id === habit.id ? updatedHabit : h
-        );
-        await AsyncStorage.setItem(GUEST_HABITS_KEY, JSON.stringify(updatedHabits));
-      }
       
-      setHabits(prevHabits => prevHabits.map(h =>
+      const updatedHabits = habits.map(h => 
         h.id === habit.id ? updatedHabit : h
-      ));
+      );
+      await AsyncStorage.setItem(GUEST_HABITS_KEY, JSON.stringify(updatedHabits));
+      
+      setHabits(updatedHabits);
     } catch (error) {
       console.error('Error updating habit completion:', error);
     }
@@ -193,14 +150,6 @@ export function HabitTracker() {
 
   const resetAllData = async () => {
     try {
-      const habitsCollection = collection(firestore, 'habits');
-      const snapshot = await getDocs(habitsCollection);
-      
-      // Delete all habits
-      await Promise.all(
-        snapshot.docs.map(doc => deleteDoc(doc.ref))
-      );
-      
       setHabits([]);
     } catch (error) {
       console.error('Error resetting data:', error);

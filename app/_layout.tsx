@@ -7,7 +7,6 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { HabitTracker } from '../components/HabitTracker';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { AuthProvider } from '@/providers/AuthProvider';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -32,28 +31,26 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-      <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen 
-            name="privacy-policy" 
-            options={{ 
-              headerShown: true,
-              title: 'Privacy Policy',
-              presentation: 'modal'
-            }} 
-          />
-          <Stack.Screen 
-            name="terms-of-service" 
-            options={{ 
-              headerShown: true,
-              title: 'Terms of Service',
-              presentation: 'modal'
-            }} 
-          />
-        </Stack>
-        <StatusBar style={isDark ? 'light' : 'dark'} />
-      </AuthProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen 
+          name="privacy-policy" 
+          options={{ 
+            headerShown: true,
+            title: 'Privacy Policy',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="terms-of-service" 
+          options={{ 
+            headerShown: true,
+            title: 'Terms of Service',
+            presentation: 'modal'
+          }} 
+        />
+      </Stack>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
     </ThemeProvider>
   );
 }
