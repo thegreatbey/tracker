@@ -6,7 +6,8 @@ Habit tracker to get used to the process of building mobile AND web apps
 -able to delete habit
 -able to track habit for a day
 -be able to view history of the habit
-=see the streak for that habit
+-see the streak for that habit
+-add a habit coach via claude (haiku) AI chat interactions
 
 ##Advance features
 -notifications

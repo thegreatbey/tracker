@@ -5,9 +5,10 @@ interface AddHabitModalProps {
   visible: boolean;
   onClose: () => void;
   onAdd: (habitName: string) => void;
+  colorScheme?: 'light' | 'dark';
 }
 
-export function AddHabitModal({ visible, onClose, onAdd }: AddHabitModalProps) {
+export function AddHabitModal({ visible, onClose, onAdd, colorScheme = 'light' }: AddHabitModalProps) {
   const [habitName, setHabitName] = useState('');
 
   const handleAdd = () => {
@@ -18,6 +19,11 @@ export function AddHabitModal({ visible, onClose, onAdd }: AddHabitModalProps) {
     }
   };
 
+  const backgroundColor = colorScheme === 'dark' ? '#1a1a1a' : '#fff';
+  const textColor = colorScheme === 'dark' ? '#fff' : '#000';
+  const borderColor = colorScheme === 'dark' ? '#333' : '#ddd';
+  const placeholderColor = colorScheme === 'dark' ? '#666' : '#999';
+
   return (
     <Modal
       animationType="slide"
@@ -26,15 +32,22 @@ export function AddHabitModal({ visible, onClose, onAdd }: AddHabitModalProps) {
       onRequestClose={onClose}
     >
       <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>Add New Habit</Text>
+        <View style={[styles.modalView, { backgroundColor }]}>
+          <Text style={[styles.modalTitle, { color: textColor }]}>Add New Habit</Text>
           
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              { 
+                borderColor,
+                color: textColor,
+                backgroundColor: colorScheme === 'dark' ? '#2a2a2a' : '#fff'
+              }
+            ]}
             value={habitName}
             onChangeText={setHabitName}
             placeholder="Enter habit name"
-            placeholderTextColor="#666"
+            placeholderTextColor={placeholderColor}
             autoFocus
           />
           
@@ -43,7 +56,10 @@ export function AddHabitModal({ visible, onClose, onAdd }: AddHabitModalProps) {
               style={[styles.button, styles.cancelButton]}
               onPress={onClose}
             >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={[
+                styles.cancelButtonText,
+                { color: colorScheme === 'dark' ? '#fff' : '#333' }
+              ]}>Cancel</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -68,7 +84,6 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: '80%',
-    backgroundColor: 'white',
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
@@ -89,7 +104,6 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 20,
@@ -105,13 +119,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   cancelButton: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   addButton: {
     backgroundColor: '#007AFF',
   },
   cancelButtonText: {
-    color: '#333',
     textAlign: 'center',
     fontWeight: '600',
   },
