@@ -30,6 +30,8 @@ export function HabitTracker() {
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
+    // Clear any stale data
+    AsyncStorage.clear();
     loadHabits();
   }, [user]);
 
@@ -55,7 +57,7 @@ export function HabitTracker() {
   const addHabit = async (habitName: string) => {
     try {
       const newHabit: Habit = {
-        id: Date.now().toString(), // Simple ID for guest mode
+        id: Date.now().toString(),
         name: habitName,
         createdAt: new Date(),
         completions: {},
@@ -63,18 +65,18 @@ export function HabitTracker() {
         longestStreak: 0
       };
 
+      // Always allow adding habits, whether in guest mode or authenticated
       if (user) {
         // Save to Firebase
         const docRef = await addDoc(collection(firestore, 'habits'), newHabit);
         newHabit.id = docRef.id;
+        setHabits(prev => [...prev, { ...newHabit, id: docRef.id }]);
       } else {
         // Save to AsyncStorage for guest mode
         const updatedHabits = [...habits, newHabit];
         await AsyncStorage.setItem(GUEST_HABITS_KEY, JSON.stringify(updatedHabits));
         setHabits(updatedHabits);
       }
-
-      setHabits(prev => [...prev, newHabit]);
     } catch (error) {
       console.error('Error adding habit:', error);
     }
@@ -142,22 +144,37 @@ export function HabitTracker() {
 
   const toggleHabitCompletion = async (habit: Habit) => {
     try {
-      const habitDoc = doc(firestore, 'habits', habit.id);
       const newCompletions = {
         ...habit.completions,
         [today]: !habit.completions[today]
       };
       
       const { current, longest } = calculateStreak(newCompletions);
-      
-      await updateDoc(habitDoc, {
+      const updatedHabit = {
+        ...habit,
         completions: newCompletions,
         currentStreak: current,
         longestStreak: Math.max(longest, habit.longestStreak || 0)
-      });
+      };
+
+      if (user) {
+        // Update in Firebase
+        const habitDoc = doc(firestore, 'habits', habit.id);
+        await updateDoc(habitDoc, {
+          completions: newCompletions,
+          currentStreak: current,
+          longestStreak: Math.max(longest, habit.longestStreak || 0)
+        });
+      } else {
+        // Update in AsyncStorage for guest mode
+        const updatedHabits = habits.map(h => 
+          h.id === habit.id ? updatedHabit : h
+        );
+        await AsyncStorage.setItem(GUEST_HABITS_KEY, JSON.stringify(updatedHabits));
+      }
       
-      setHabits(prevHabits => prevHabits.map(habit =>
-        habit.id === habit.id ? { ...habit, completions: newCompletions, currentStreak: current, longestStreak: Math.max(longest, habit.longestStreak || 0) } : habit
+      setHabits(prevHabits => prevHabits.map(h =>
+        h.id === habit.id ? updatedHabit : h
       ));
     } catch (error) {
       console.error('Error updating habit completion:', error);
@@ -207,16 +224,94 @@ export function HabitTracker() {
         { color: colorScheme === 'dark' ? '#fff' : '#000' }
       ]}>Habit Tracker</Text>
 
-      <View style={styles.emptyState}>
-        <Text style={[
-          styles.emptyStateText,
-          { color: colorScheme === 'dark' ? '#fff' : '#333' }
-        ]}>No habits tracked yet</Text>
-        <Text style={[
-          styles.emptyStateSubtext,
-          { color: colorScheme === 'dark' ? '#aaa' : '#666' }
-        ]}>Tap + to add your first habit</Text>
-      </View>
+      {habits.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={[
+            styles.emptyStateText,
+            { color: colorScheme === 'dark' ? '#fff' : '#333' }
+          ]}>No habits tracked yet</Text>
+          <Text style={[
+            styles.emptyStateSubtext,
+            { color: colorScheme === 'dark' ? '#aaa' : '#666' }
+          ]}>Tap + to add your first habit</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={habits}
+          contentContainerStyle={styles.listContent}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={[
+              styles.habitItem,
+              { backgroundColor: colorScheme === 'dark' ? '#333' : '#f8f8f8' }
+            ]}>
+              <View style={styles.habitInfo}>
+                <Text style={[
+                  styles.habitName,
+                  { color: colorScheme === 'dark' ? '#fff' : '#000' }
+                ]}>{item.name}</Text>
+                <Text style={styles.streakText}>
+                  Current Streak: {item.currentStreak} days
+                </Text>
+                <Text style={styles.streakText}>
+                  Longest Streak: {item.longestStreak} days
+                </Text>
+              </View>
+              
+              <View style={styles.habitActions}>
+                <View style={styles.weekView}>
+                  {getLastSevenDays().map((date) => (
+                    <TouchableOpacity
+                      key={date}
+                      style={[
+                        styles.dayButton,
+                        item.completions[date] && styles.dayButtonCompleted
+                      ]}
+                      onPress={() => toggleHabitCompletion(item)}
+                    >
+                      <Text style={[
+                        styles.dayButtonText,
+                        item.completions[date] && styles.dayButtonTextCompleted
+                      ]}>
+                        {new Date(date).toLocaleDateString(undefined, { weekday: 'short' })}
+                      </Text>
+                      {item.completions[date] && (
+                        <Ionicons
+                          name="checkmark"
+                          size={12}
+                          color="#fff"
+                          style={styles.checkmark}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                
+                <View style={styles.bottomActions}>
+                  <TouchableOpacity
+                    style={item.completions[today] ? styles.completedButton : styles.completeButton}
+                    onPress={() => toggleHabitCompletion(item)}
+                  >
+                    <Text style={styles.completeButtonText}>
+                      {item.completions[today] ? 'Completed' : 'Complete for Today'}
+                    </Text>
+                    {item.completions[today] && (
+                      <Ionicons name="checkmark" size={16} color="#fff" />
+                    )}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => deleteHabit(item.id)}
+                  >
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+        />
+      )}
 
       <NavigationBar
         onHomePress={() => {}}
